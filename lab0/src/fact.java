@@ -1,5 +1,6 @@
 package lab0.src;
 
+import java.math.BigInteger;
 import java.util.Scanner;
 
 public class fact {
@@ -20,7 +21,7 @@ public class fact {
                     n = reader.nextInt();
                     if(n >= 0){
                         
-                        long silnia = calcFactorial(n);
+                        BigInteger silnia = BigInteger.valueOf(calcFactorial(n));
                         System.out.println("Factorial of " + n + " is " + silnia);
                     }
                 case 2:
