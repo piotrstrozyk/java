@@ -18,7 +18,6 @@ public class Main {
                     long power = calc.calcPower(n);
                     System.out.println("2 to the power of " + n + " is " + power);
                 }
-
                 case 2 -> {
                     System.out.println("Enter 2 numbers: ");
                     int a = sc.nextInt();
