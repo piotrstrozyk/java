@@ -34,11 +34,12 @@ public class MyCalendar {
     public ArrayList<Meeting> getMeetingsPastTime(int day, LocalTime time){
         ArrayList<Meeting> pastTime = new ArrayList<Meeting>();
         for(int i = 0; i < week[day].size(); i++){
-            if(week[day].get(i).getStartTime().isAfter(time)){
+            if(!week[day].get(i).getStartTime().isBefore(time)){
                 pastTime.add(week[day].get(i));
             }
         }
         return pastTime;
     };
+
 }
 
