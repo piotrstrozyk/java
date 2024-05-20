@@ -6,6 +6,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         MyCalendar cal = new MyCalendar();
         testing(cal);
+        taskTesting(cal);
         System.out.println("Program schedules meetings in a calendar");
         int m = 1;
         while (m != 0) {
@@ -13,27 +14,34 @@ public class Main {
                     Choose:\s
                     0-Exit
                     1-Add new meeting
-                    2-Remove meeting
-                    3-Display all meetings for day
-                    4-Display all meetings of given priority for day
-                    5-Display all meetings starting past given time for day
-                    6-Display all meetings taking place between given times for day
-                    7-Display all meetings of given priority starting past given time for day""");
+                    2-Add new task
+                    3-Remove meeting
+                    4-Remove task
+                    5-Display all meetings for day
+                    6-Display all tasks for day
+                    7-Display all meetings of given priority for day
+                    8-Display all tasks of given status for day
+                    9-Display all meetings of given priority starting past given time for day
+                    10-Display all tasks of given status ending before given time for day""");
             m = sc.nextInt();
             switch(m){
                 case 0 -> System.out.println("Finished");
-                case 1 -> addMeeting(cal, sc);
-                case 2 -> removeMeeting(cal, sc);
-                case 3 -> displayMeetings(cal, sc);
-                case 4 -> displayMeetingsOfPriority(cal, sc);
-                case 5 -> displayMeetingsPastTime(cal, sc);
-                case 6 -> displayMeetingsBetweenTimes(cal, sc);
-                case 7 -> displayMeetingsOfPriorityUntil(cal, sc);
+                case 1 -> addEvent(cal, sc, "meeting");
+                case 2 -> addEvent(cal, sc);
+                case 3 -> removeMeeting(cal, sc);
+                case 4 -> removeTask(cal, sc);
+                case 5 -> displayMeetings(cal, sc);
+                case 6 -> displayTasks(cal, sc);
+                case 7 -> displayMeetingsOfPriority(cal, sc);
+                case 8 -> displayTasksOfStatus(cal, sc);
+                case 9 -> displayMeetingsOfPriorityPast(cal, sc);
+                case 10 -> displayTasksOfStatusUntil(cal, sc);
+                default -> System.out.println("Incorrect input");
 
             }
         }
     }
-    public static void addMeeting(MyCalendar cal, Scanner sc){
+    public static void addEvent(MyCalendar cal, Scanner sc, String eventType){
         System.out.println("Enter day number (1-7)");
         int day = sc.nextInt();
         sc.nextLine();
@@ -51,10 +59,28 @@ public class Main {
         String priority = sc.nextLine();
         cal.addMeeting(day, description, LocalTime.parse(startTime), LocalTime.parse(endTime), priority);
     }
+    public static void addEvent(MyCalendar cal, Scanner sc){
+        System.out.println("Enter day number (1-7)");
+        int day = sc.nextInt();
+        sc.nextLine();
+        System.out.println("Enter task description");
+        String description = sc.nextLine();
+        System.out.println("Enter task start time (HH:MM:SS)");
+        String startTime = sc.nextLine();
+        while (LocalTime.parse(startTime).isBefore(Task.MIN_TIME)){
+            System.out.println("Incorrect time, task can't start before 6'. Enter again.");
+            startTime = sc.nextLine();
+        }
+        System.out.println("Enter task end time");
+        String endTime = sc.nextLine();
+        System.out.println("Enter status (planned, confirmed, inProgress, completed)");
+        String status = sc.nextLine();
+        cal.addTask(day, description, LocalTime.parse(startTime), LocalTime.parse(endTime), status);
+    }
     public static void displayMeetings(MyCalendar cal, Scanner sc){
         System.out.println("Enter day number (1-7)");
         int day = sc.nextInt();
-        ArrayList<Meeting> meetings = cal.filterMeetings(day + 1, s -> true);
+        ArrayList<Event> meetings = cal.filterEvents(day + 1, s -> s instanceof Meeting);
         for(int i = 0; i < meetings.size(); i++){
             System.out.println("ID:" + i +
                     "  Description: " + '"' + meetings.get(i).getDescription() + '"' +
@@ -63,15 +89,39 @@ public class Main {
                     "  Priority: " + meetings.get(i).getPriority());
         }
     }
+    public static void displayTasks(MyCalendar cal, Scanner sc){
+        System.out.println("Enter day number (1-7)");
+        int day = sc.nextInt();
+        ArrayList<Event> tasks = cal.filterEvents(day + 1, s -> s instanceof Task);
+        for(int i = 0; i < tasks.size(); i++){
+            Task task = (Task) tasks.get(i);
+            System.out.println("ID:" + i +
+                    "  Description: " + '"' + task.getDescription() + '"' +
+                    "  Start time: " + task.getStartTime() +
+                    "  End Time: " + task.getEndTime() +
+                    "  Status: " + task.getStatus());
+        }
+    }
     public static void displayMeetings(MyCalendar cal, int day){
         System.out.println("Enter day number (1-7)");
-        ArrayList<Meeting> meetings = cal.filterMeetings(day + 1, s -> true);
+        ArrayList<Event> meetings = cal.filterEvents(day + 1, s -> s instanceof Meeting);
         for(int i = 0; i < meetings.size(); i++){
             System.out.println("ID:" + i +
                     "  Description: " + '"' + meetings.get(i).getDescription() + '"' +
                     "  Start time: " + meetings.get(i).getStartTime() +
                     "  End Time: " + meetings.get(i).getEndTime() +
                     "  Priority: " + meetings.get(i).getPriority());
+        }
+    }
+    public static void displayTasks(MyCalendar cal, int day){
+        ArrayList<Event> tasks = cal.filterEvents(day + 1, s -> s instanceof Task);
+        for(int i = 0; i < tasks.size(); i++){
+            Task task = (Task) tasks.get(i);
+            System.out.println("ID:" + i +
+                    "  Description: " + '"' + task.getDescription() + '"' +
+                    "  Start time: " + task.getStartTime() +
+                    "  End Time: " + task.getEndTime() +
+                    "  Status: " + task.getStatus());
         }
     }
     public static void removeMeeting(MyCalendar cal, Scanner sc){
@@ -81,7 +131,16 @@ public class Main {
         System.out.println("Enter meeting index");
 
         int index = sc.nextInt();
-        cal.deleteMeeting(day + 1, index);
+        cal.deleteEvent(day + 1, index, s -> s instanceof Meeting);
+    }
+    public static void removeTask(MyCalendar cal, Scanner sc){
+        System.out.println("Enter day number (1-7)");
+        int day = sc.nextInt();
+        displayTasks(cal, day);
+        System.out.println("Enter task index");
+
+        int index = sc.nextInt();
+        cal.deleteEvent(day + 1, index, s -> s instanceof Task);
     }
     public static void displayMeetingsOfPriority(MyCalendar cal, Scanner sc){
         System.out.println("Enter day number (1-7)");
@@ -89,7 +148,7 @@ public class Main {
         sc.nextLine();
         System.out.println("Enter priority (normal, high, highest)");
         String priority = sc.nextLine();
-        ArrayList<Meeting> meetings = cal.filterMeetings(day + 1, s -> s.getPriority().equals(Meeting.Priority.valueOf(priority)));
+        ArrayList<Event> meetings = cal.filterEvents(day + 1, s -> priority.equals(s.getPriority()));
         for(int i = 0; i < meetings.size(); i++){
             System.out.println("ID:" + i +
                     "  Description: " + '"' + meetings.get(i).getDescription() + '"' +
@@ -98,27 +157,23 @@ public class Main {
                     "  Priority: " + meetings.get(i).getPriority());
         }
     }
-    public static void displayMeetingsPastTime(MyCalendar cal, Scanner sc){
+    public static void displayTasksOfStatus(MyCalendar cal, Scanner sc){
         System.out.println("Enter day number (1-7)");
         int day = sc.nextInt();
         sc.nextLine();
-        System.out.println("Enter time (HH:MM:SS)");
-        LocalTime time = LocalTime.parse(sc.nextLine());
-        ArrayList<Meeting> meetings = cal.filterMeetings(day + 1, s -> !s.getStartTime().isBefore(time));
-        printResult(meetings);
+        System.out.println("Enter status (planned, confirmed, inProgress, completed)");
+        String status = sc.nextLine();
+        ArrayList<Event> tasks = cal.filterEvents(day + 1, s -> s instanceof Task && status.equals(((Task) s).getStatus().name()));
+        for(int i = 0; i < tasks.size(); i++){
+            Task task = (Task) tasks.get(i);
+            System.out.println("ID:" + i +
+                    "  Description: " + '"' + task.getDescription() + '"' +
+                    "  Start time: " + task.getStartTime() +
+                    "  End Time: " + task.getEndTime() +
+                    "  Status: " + task.getStatus());
+        }
     }
-    public static void displayMeetingsBetweenTimes(MyCalendar cal, Scanner sc){
-        System.out.println("Enter day number (1-7)");
-        int day = sc.nextInt();
-        sc.nextLine();
-        System.out.println("Enter start time (HH:MM:SS)");
-        LocalTime timeFrom = LocalTime.parse(sc.nextLine());
-        System.out.println("Enter end time (HH:MM:SS)");
-        LocalTime timeUntil = LocalTime.parse(sc.nextLine());
-        ArrayList<Meeting> meetings = cal.filterMeetings(day + 1, s -> !s.getStartTime().isBefore(timeFrom) && !s.getEndTime().isAfter(timeUntil));
-        printResult(meetings);
-    }
-    public static void displayMeetingsOfPriorityUntil(MyCalendar cal, Scanner sc){
+    public static void displayMeetingsOfPriorityPast(MyCalendar cal, Scanner sc){
         System.out.println("Enter day number (1-7)");
         int day = sc.nextInt();
         sc.nextLine();
@@ -126,12 +181,23 @@ public class Main {
         LocalTime time = LocalTime.parse(sc.nextLine());
         System.out.println("Enter priority (normal, high, highest)");
         String priority = sc.nextLine();
-        ArrayList<Meeting> meetings = cal.filterMeetings(day + 1, s -> !s.getStartTime().isBefore(time) && s.getPriority().equals(Meeting.Priority.valueOf(priority)));
+        ArrayList<Event> meetings = cal.filterEvents(day + 1, s -> (s.getStartTime().isAfter(time) || s.getStartTime().equals(time)) && priority.equals(s.getPriority()));
         printResult(meetings);
     }
-    public static void printResult(ArrayList<Meeting> elems){
-        for (Meeting meetings : elems){
-            System.out.println(meetings.toString());
+    public static void displayTasksOfStatusUntil(MyCalendar cal, Scanner sc){
+        System.out.println("Enter day number (1-7)");
+        int day = sc.nextInt();
+        sc.nextLine();
+        System.out.println("Enter time (HH:MM:SS)");
+        LocalTime time = LocalTime.parse(sc.nextLine());
+        System.out.println("Enter status (planned, confirmed, inProgress, completed)");
+        String status = sc.nextLine();
+        ArrayList<Event> tasks = cal.filterEvents(day + 1, s -> s instanceof Task && !s.getEndTime().isAfter(time) && status.equals(((Task) s).getStatus().name()));
+        printResult(tasks);
+    }
+    public static void printResult(ArrayList<Event> elems){
+        for (Event events : elems){
+            System.out.println(events.toString());
         }
     }
     public static void testing(MyCalendar cal){
@@ -146,4 +212,17 @@ public class Main {
         cal.addMeeting(1, "ninth", LocalTime.parse("10:00"),  LocalTime.parse("13:00"), "normal");
         cal.addMeeting(1, "tenth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high");
     }
+    public static void taskTesting(MyCalendar cal){
+        cal.addTask(1, "task1", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "planned");
+        cal.addTask(1, "task2", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed");
+        cal.addTask(1, "task3", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "inProgress");
+        cal.addTask(1, "task4", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "completed");
+        cal.addTask(1, "task5", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "planned");
+        cal.addTask(1, "task6", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed");
+        cal.addTask(1, "task7", LocalTime.parse("10:00"),  LocalTime.parse("11:00"), "inProgress");
+        cal.addTask(1, "task8", LocalTime.parse("10:00"),  LocalTime.parse("12:00"), "completed");
+        cal.addTask(1, "task9", LocalTime.parse("10:00"),  LocalTime.parse("13:00"), "planned");
+        cal.addTask(1, "task10", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed");
+    }
+
 }
