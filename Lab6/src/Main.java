@@ -26,8 +26,8 @@ public class Main {
             m = sc.nextInt();
             switch(m){
                 case 0 -> System.out.println("Finished");
-                case 1 -> addEvent(cal, sc, "meeting");
-                case 2 -> addEvent(cal, sc);
+                case 1 -> addMeeting(cal, sc);
+                case 2 -> addTask(cal, sc);
                 case 3 -> removeMeeting(cal, sc);
                 case 4 -> removeTask(cal, sc);
                 case 5 -> displayMeetings(cal, sc);
@@ -41,7 +41,7 @@ public class Main {
             }
         }
     }
-    public static void addEvent(MyCalendar cal, Scanner sc, String eventType){
+    public static void addMeeting(MyCalendar cal, Scanner sc){
         System.out.println("Enter day number (1-7)");
         int day = sc.nextInt();
         sc.nextLine();
@@ -57,9 +57,9 @@ public class Main {
         String endTime = sc.nextLine();
         System.out.println("Enter priority (normal, high, highest)");
         String priority = sc.nextLine();
-        cal.addMeeting(day, description, LocalTime.parse(startTime), LocalTime.parse(endTime), priority);
+        cal.addEvent(day, new Meeting(description, LocalTime.parse(startTime), LocalTime.parse(endTime), priority));
     }
-    public static void addEvent(MyCalendar cal, Scanner sc){
+    public static void addTask(MyCalendar cal, Scanner sc){
         System.out.println("Enter day number (1-7)");
         int day = sc.nextInt();
         sc.nextLine();
@@ -75,7 +75,7 @@ public class Main {
         String endTime = sc.nextLine();
         System.out.println("Enter status (planned, confirmed, inProgress, completed)");
         String status = sc.nextLine();
-        cal.addTask(day, description, LocalTime.parse(startTime), LocalTime.parse(endTime), status);
+        cal.addEvent(day, new Task(description, LocalTime.parse(startTime), LocalTime.parse(endTime), status));
     }
     public static void displayMeetings(MyCalendar cal, Scanner sc){
         System.out.println("Enter day number (1-7)");
@@ -201,28 +201,28 @@ public class Main {
         }
     }
     public static void testing(MyCalendar cal){
-        cal.addMeeting(1, "first", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high");
-        cal.addMeeting(1, "second", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high");
-        cal.addMeeting(1, "third", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "highest");
-        cal.addMeeting(1, "fourth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high");
-        cal.addMeeting(1, "fifth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "normal");
-        cal.addMeeting(1, "sixth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high");
-        cal.addMeeting(1, "seventh", LocalTime.parse("10:00"),  LocalTime.parse("11:00"), "highest");
-        cal.addMeeting(1, "eight", LocalTime.parse("10:00"),  LocalTime.parse("12:00"), "high");
-        cal.addMeeting(1, "ninth", LocalTime.parse("10:00"),  LocalTime.parse("13:00"), "normal");
-        cal.addMeeting(1, "tenth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high");
+        cal.addEvent(1, new Meeting("first", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high"));
+        cal.addEvent(1, new Meeting("second", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high"));
+        cal.addEvent(1, new Meeting("third", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "highest"));
+        cal.addEvent(1, new Meeting("fourth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high"));
+        cal.addEvent(1, new Meeting("fifth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "normal"));
+        cal.addEvent(1, new Meeting("sixth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high"));
+        cal.addEvent(1, new Meeting("seventh", LocalTime.parse("10:00"),  LocalTime.parse("11:00"), "highest"));
+        cal.addEvent(1, new Meeting("eight", LocalTime.parse("10:00"),  LocalTime.parse("12:00"), "high"));
+        cal.addEvent(1, new Meeting("ninth", LocalTime.parse("10:00"),  LocalTime.parse("13:00"), "normal"));
+        cal.addEvent(1, new Meeting("tenth", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "high"));
     }
     public static void taskTesting(MyCalendar cal){
-        cal.addTask(1, "task1", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "planned");
-        cal.addTask(1, "task2", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed");
-        cal.addTask(1, "task3", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "inProgress");
-        cal.addTask(1, "task4", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "completed");
-        cal.addTask(1, "task5", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "planned");
-        cal.addTask(1, "task6", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed");
-        cal.addTask(1, "task7", LocalTime.parse("10:00"),  LocalTime.parse("11:00"), "inProgress");
-        cal.addTask(1, "task8", LocalTime.parse("10:00"),  LocalTime.parse("12:00"), "completed");
-        cal.addTask(1, "task9", LocalTime.parse("10:00"),  LocalTime.parse("13:00"), "planned");
-        cal.addTask(1, "task10", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed");
+        cal.addEvent(1, new Task("task1", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "planned"));
+        cal.addEvent(1, new Task("task2", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed"));
+        cal.addEvent(1, new Task("task3", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "inProgress"));
+        cal.addEvent(1, new Task("task4", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "completed"));
+        cal.addEvent(1, new Task("task5", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "planned"));
+        cal.addEvent(1, new Task("task6", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed"));
+        cal.addEvent(1, new Task("task7", LocalTime.parse("10:00"),  LocalTime.parse("11:00"), "inProgress"));
+        cal.addEvent(1, new Task("task8", LocalTime.parse("10:00"),  LocalTime.parse("12:00"), "completed"));
+        cal.addEvent(1, new Task("task9", LocalTime.parse("10:00"),  LocalTime.parse("13:00"), "planned"));
+        cal.addEvent(1, new Task("task10", LocalTime.parse("07:00"),  LocalTime.parse("08:00"), "confirmed"));
     }
 
 }

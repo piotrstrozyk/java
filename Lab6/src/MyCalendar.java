@@ -11,11 +11,11 @@ public class MyCalendar {
             week[day] = new ArrayList<Event>();
         }
     }
-    public void addMeeting(int day, String description, LocalTime startTime, LocalTime endTime, String priority){
-        week[day + 1].add(new Meeting(description, startTime, endTime, priority));
+    public void addEvent(int day, Meeting meeting) {
+        week[day + 1].add(meeting);
     }
-    public void addTask(int day, String description, LocalTime startTime, LocalTime endTime, String status){
-        week[day + 1].add(new Task(description, startTime, endTime, status));
+    public void addEvent(int day, Task task) {
+        week[day + 1].add(task);
     }
     public void deleteEvent(int day, int index, Predicate<Event> condition) {
         ArrayList<Event> events = filterEvents(day, condition);
